@@ -42,6 +42,13 @@ export const SidebarUse = ({ children }: { children: ReactNode }) => {
                 <Image src='/images/call.svg' alt='' width={24} height={24} />
             ),
         },
+        {
+            label: "Subscribe",
+            href: "/authentified/user/subscribe",
+            icon: (
+                <Image src='/images/fire.svg' alt='' width={24} height={24} />
+            ),
+        },
         // {
         //     label: "Setting",
         //     href: "#",

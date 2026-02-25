@@ -34,55 +34,53 @@ export const YearlyVisitorsChart = ({ dashboardData }: any) => {
     }, [dashboardData]);
 
     const handleAddData = async () => {
-        // Validation for inputs
+        // Validation pour éviter les erreurs côté utilisateur
         if (!newLabel.trim()) {
             setError("Label cannot be empty.");
             return;
         }
         if (newVisitor === "" || newVisitor < 0) {
-            setError("Visitors count must be a non-negative number .");
+            setError("Visitors count must be a non-negative number.");
             return;
         }
-
-        // Clear any existing error
-        setError("");
-
+    
+        // Mise à jour localement pour un rendu immédiat
+        setChartData((prevData) => ({
+            labels: [...prevData.labels, newLabel],
+            visitors: [...prevData.visitors, newVisitor],
+        }));
+    
+        setError(""); // Réinitialisation des erreurs
+    
         try {
+            // Enregistrement dans la base de données via API
             const response = await fetch(`/api/dashboards/${dashboardData._id}`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    type: 'yearlyVisitors',
+                    type: "yearlyVisitors",
                     data: {
                         label: newLabel,
                         value: newVisitor,
-                    }
+                    },
                 }),
             });
-
+    
             if (!response.ok) {
                 const result = await response.json();
                 throw new Error(result.error || "Failed to add new yearly data.");
             }
-
-            const result = await response.json();
-
-            console.log("Response from POST:", result);
-
-            // Update the chart data with the newly added yearly data
-            setChartData((prevData) => ({
-                labels: [...prevData.labels, result.label],
-                visitors: [...prevData.visitors, result.value],
-            }));
-
-            // Clear input fields
-            setNewLabel("");
-            setNewVisitor("");
+    
+            console.log("Data successfully saved in database.");
         } catch (error: any) {
             console.error("Error adding data:", error);
-            setError(error.message);
+            setError(error.message || "Failed to save data.");
+        } finally {
+            // Nettoyage des champs d'entrée
+            setNewLabel("");
+            setNewVisitor("");
         }
     };
 
