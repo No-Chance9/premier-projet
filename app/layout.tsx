@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
-import { SidebarUse } from "./components/sidebarUse";
-import Header from "./components/header";
 import { Provider } from  "./provider";
 
 
@@ -34,10 +32,7 @@ export default function RootLayout({
         <body
           className={`${interSans.variable} ${geistMono.variable} antialiased inter.className`}
         >
-            {/* <SidebarUse > */}
-                {/* <Header /> */}
-              {children}
-            {/* </SidebarUse>         */}
+          {children}
         </body>
       </Provider>
     </html>

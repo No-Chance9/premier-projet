@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from "next/navigation";
 import Image from 'next/image';
 import UploadForm from '@/app/components/uploadForm';
@@ -7,7 +7,7 @@ import { useSession } from "next-auth/react";
 import { setConfig } from 'next/config';
 
 
-export default function YourProfile() {
+function YourProfileContent() {
     const searchParams = useSearchParams();
     const email = searchParams.get("email");
     const [userData, setUserData] = useState<any>({});
@@ -95,5 +95,13 @@ export default function YourProfile() {
                 <div className="text-gray-700">Loading...</div>
             )}
         </div>
+    );
+}
+
+export default function YourProfile() {
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+            <YourProfileContent />
+        </Suspense>
     );
 }

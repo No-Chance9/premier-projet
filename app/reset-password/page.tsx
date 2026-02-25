@@ -1,9 +1,9 @@
 // app/reset-password/page.tsx
 "use client";
-import { useState } from "react";
+import { Suspense, useState } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function ResetPassword() {
+function ResetPasswordContent() {
     const [password, setPassword] = useState("");
     const [confirmPassword, setConfirmPassword] = useState("");
     const [message, setMessage] = useState("");
@@ -84,10 +84,18 @@ export default function ResetPassword() {
                     onClick={handleGoHome}
                     className="mt-4 bg-indigo-500 text-white font-bold py-2 px-4 rounded hover:bg-indigo-600 focus:outline-none focus:shadow-outline"
                 >
-                    Retour à l'accueil
+                    Retour à l&apos;accueil
                 </button>
             )}
 
         </div>
+    );
+}
+
+export default function ResetPassword() {
+    return (
+        <Suspense fallback={<div className="flex h-screen items-center justify-center">Loading...</div>}>
+            <ResetPasswordContent />
+        </Suspense>
     );
 }
