@@ -4,15 +4,16 @@ import { getToken } from 'next-auth/jwt';
 
 export default async function middleware(request: NextRequest) {
     const secret = process.env.NEXTAUTH_SECRET;
+    const isSecure = request.nextUrl.protocol === "https:";
 
     // Récupérer le token JWT de la requête
-    const token = await getToken({ req: request, secret, secureCookie: false });
+    const token = await getToken({ req: request, secret, secureCookie: isSecure });
     console.log('token:', token);
 
     // Si aucun token n'est présent, rediriger vers la page de connexion
     if (!token) {
         console.log('Token absent, redirection vers la page de connexion');
-        return NextResponse.redirect(new URL('/', request.url));
+        return NextResponse.redirect(new URL('/login', request.url));
     }
 
     const { pathname } = request.nextUrl;
