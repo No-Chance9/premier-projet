@@ -17,10 +17,8 @@ const UploadForm: React.FC = () => {
     if (emailFromSession) {
       setEmail(emailFromSession); // Assurez-vous que l'email est disponible
       console.log("localsto", emailFromSession);
-    } else {
-      setUploadStatus("Email not found in local storage");
     }
-  }, []);
+  }, [user?.email]);
 
   const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files[0]) {
@@ -57,7 +55,7 @@ const UploadForm: React.FC = () => {
         // Étape 2 : Associer l'image au profil de l'utilisateur via l'email
         await linkProfilePicture(email, imageId);
       } else {
-        setUploadStatus("Error during upload");
+        setUploadStatus(`Error during upload: ${result.error || "unknown error"}`);
         console.error("Error during upload:", result.error);
       }
     } catch (error) {

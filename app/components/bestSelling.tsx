@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import { PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 
 
-export default function BestSelling({ data, setformSubmitFromChildren }: any) {
+export default function BestSelling({ data, setformSubmitFromChildren, onDashboardChange }: any) {
     const [values, setValues] = useState<
         Array<{
             name: string;
@@ -65,6 +65,7 @@ export default function BestSelling({ data, setformSubmitFromChildren }: any) {
 
             // Mise à jour locale
             setValues(updatedDashboard.bestSelling);
+            onDashboardChange?.();
         } catch (error) {
             console.error(`Error updating ${field}:`, error);
             alert(`Failed to update ${field}. Please try again.`);
@@ -94,6 +95,7 @@ export default function BestSelling({ data, setformSubmitFromChildren }: any) {
 
             // Mise à jour locale
             setValues(updatedDashboard.bestSelling);
+            onDashboardChange?.();
         } catch (error) {
             console.error("Error deleting product:", error);
             alert("Failed to delete product. Please try again.");
@@ -137,6 +139,7 @@ export default function BestSelling({ data, setformSubmitFromChildren }: any) {
 
             // Mise à jour locale instantanée
             setValues(updatedDashboard.bestSelling);
+            onDashboardChange?.();
 
             // Réinitialisation du formulaire
             setNewProduct({ name: "", price: "", sold: "", stock: "" });

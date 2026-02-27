@@ -1,6 +1,5 @@
 import { useEffect, useState } from "react";
 import { useSession } from "next-auth/react"; // For user session management
-import ButtonGroup from "./buttonGroup";
 import Totaux from "./totaux";
 import { CustomerGrowthChart } from "./customerGrowth";
 import { YearlyVisitorsChart } from "./yearlyVisitors";
@@ -124,10 +123,14 @@ export const Dashboard = ({ setformSubmitFromChildren }: any) => {
                     <CustomerGrowthChart data={dashboardData} />
                 </div>
                 <div className="bg-gray-100 dark:bg-neutral-800 p-6 rounded-lg shadow">
-                    <YearlyVisitorsChart dashboardData={dashboardData} />
+                    <YearlyVisitorsChart dashboardData={dashboardData} onDashboardChange={fetchDashboard} />
                 </div>
                 <div className="lg:col-span-3 bg-gray-100 dark:bg-neutral-800 p-6 rounded-lg shadow">
-                    <BestSelling data={dashboardData} setformSubmitFromChildren={setformSubmitFromChildren} />
+                    <BestSelling
+                        data={dashboardData}
+                        setformSubmitFromChildren={setformSubmitFromChildren}
+                        onDashboardChange={fetchDashboard}
+                    />
                 </div>
             </section>
         </main>

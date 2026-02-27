@@ -1,14 +1,6 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 import { connectDB } from '../../../lib/mongodb';
 import ProfilePicture from '../../../models/ProfilePicture';
-
-// Configuration du dossier de téléchargement
-const uploadDir = path.join(process.cwd(), 'public/photoProfil');
-if (!fs.existsSync(uploadDir)) {
-    fs.mkdirSync(uploadDir, { recursive: true });
-}
 
 // API Route pour le téléchargement et l'enregistrement en BDD
 export async function POST(req: Request) {
@@ -22,16 +14,15 @@ export async function POST(req: Request) {
         return NextResponse.json({ error: 'File is missing' }, { status: 400 });
     }
 
-    // Enregistrer le fichier sur le serveur
-    const filePath = path.join(uploadDir, file.name);
     const buffer = Buffer.from(await file.arrayBuffer());
-    fs.writeFileSync(filePath, buffer);
+    const mimeType = file.type || "application/octet-stream";
+    const dataUri = `data:${mimeType};base64,${buffer.toString("base64")}`;
 
-    // Sauvegarder les métadonnées du fichier dans MongoDB
+    // Sauvegarder l'image en base (évite le filesystem local non persistant en prod)
     try {
         const newImage = await ProfilePicture.create({
             fileName: file.name,
-            path: `/photoProfil/${file.name}`,
+            path: dataUri,
             description: description || '',
         });
         return NextResponse.json({ message: 'File uploaded successfully', file: newImage });

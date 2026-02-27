@@ -4,7 +4,7 @@ import { Pie } from "react-chartjs-2";
 import "chart.js/auto";
 import { MinusCircleIcon, PlusCircleIcon, TrashIcon } from "@heroicons/react/24/outline";
 
-export const YearlyVisitorsChart = ({ dashboardData }: any) => {
+export const YearlyVisitorsChart = ({ dashboardData, onDashboardChange }: any) => {
     const [chartData, setChartData] = useState<{
         labels: string[];
         visitors: number[];
@@ -72,7 +72,8 @@ export const YearlyVisitorsChart = ({ dashboardData }: any) => {
                 const result = await response.json();
                 throw new Error(result.error || "Failed to add new yearly data.");
             }
-    
+
+            onDashboardChange?.();
             console.log("Data successfully saved in database.");
         } catch (error: any) {
             console.error("Error adding data:", error);
@@ -112,6 +113,7 @@ export const YearlyVisitorsChart = ({ dashboardData }: any) => {
                 visitors: prevData.visitors.filter((_, index) => prevData.labels[index] !== label), // Supprimer le visiteur correspondant
             }));
 
+            onDashboardChange?.();
             // sendLabelToparent(newLabel);
         } catch (error) {
             console.error("Error deleting label:", error);
