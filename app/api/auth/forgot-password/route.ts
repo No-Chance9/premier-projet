@@ -31,7 +31,15 @@ export async function POST(req: Request) {
         user.resetPasswordExpires = Date.now() + 3600000; // 1 heure
         await user.save();
 
-        const resetUrl = `${process.env.NEXTAUTH_URL}/reset-password?token=${resetToken}`;
+        const appBaseUrl = process.env.NEXTAUTH_URL?.trim();
+        if (!appBaseUrl) {
+            return NextResponse.json(
+                { error: "NEXTAUTH_URL is not configured." },
+                { status: 500 }
+            );
+        }
+
+        const resetUrl = new URL(`/reset-password?token=${resetToken}`, appBaseUrl).toString();
 
         const transporter = nodemailer.createTransport({
             host: "smtp.mailtrap.io",

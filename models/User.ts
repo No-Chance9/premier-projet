@@ -44,10 +44,16 @@ const UserSchema = new Schema<UserDocument>({
         type: String,
         required: [true, "Password is required"],
         minlength: [8, "Password must be at least 8 characters long"], // Minimum 8 characters
-        match: [
-            /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/,
-            "Password must have at least one uppercase letter, one lowercase letter, one number, and one special character.",
-        ],
+        validate: {
+            validator: (value: string) => {
+                const plainPasswordRegex =
+                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&#])[A-Za-z\d@$!%*?&#]{8,}$/;
+                const bcryptHashRegex = /^\$2[aby]\$\d{2}\$[./A-Za-z0-9]{53}$/;
+                return plainPasswordRegex.test(value) || bcryptHashRegex.test(value);
+            },
+            message:
+                "Password must be a strong plain password or a valid bcrypt hash.",
+        },
     },
     name: {
         type: String,

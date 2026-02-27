@@ -18,23 +18,36 @@ function ResetPasswordContent() {
             setMessage("Passwords do not match.");
             return;
         }
+        if (!token) {
+            setMessage("Missing or invalid reset token.");
+            return;
+        }
 
+        try {
+            const response = await fetch("/api/auth/reset-password", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({ token, password }),
+            });
 
-        const response = await fetch("/api/auth/reset-password", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-            },
-            body: JSON.stringify({ token, password }),
-        });
+            let result: any = {};
+            try {
+                result = await response.json();
+            } catch {
+                result = {};
+            }
 
-        const result = await response.json();
-
-        if (response.ok) {
-            setMessage("Your password has been reset successfully!");
-            setShowHomeButton(true); // Afficher le bouton pour rediriger
-        } else {
-            setMessage(result.error || "Something went wrong.");
+            if (response.ok) {
+                setMessage("Your password has been reset successfully!");
+                setShowHomeButton(true); // Afficher le bouton pour rediriger
+            } else {
+                setMessage(result.error || "Something went wrong.");
+            }
+        } catch (error) {
+            console.error("Reset request failed:", error);
+            setMessage("An unexpected error occurred.");
         }
     };
 

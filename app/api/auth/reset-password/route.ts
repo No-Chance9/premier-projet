@@ -15,41 +15,48 @@ function validatePassword(password: string): string | null {
 }
 
 export async function POST(request: Request) {
-    const { token, password } = await request.json();
-    if (!token || !password) {
-        return NextResponse.json({ error: "Token and password are required" }, { status: 400 });
-    }
+    try {
+        const { token, password } = await request.json();
+        if (!token || !password) {
+            return NextResponse.json({ error: "Token and password are required" }, { status: 400 });
+        }
 
-    const validationError = validatePassword(password);
-    if (validationError) {
-        return NextResponse.json({ error: validationError }, { status: 400 });
-    }
+        const validationError = validatePassword(password);
+        if (validationError) {
+            return NextResponse.json({ error: validationError }, { status: 400 });
+        }
 
-    await connectDB();
+        await connectDB();
 
-    // Hash the token and find the user
-    const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
-    const user = await User.findOne({
-        resetPasswordToken: hashedToken,
-        resetPasswordExpires: { $gt: Date.now() }, // Ensure the token is not expired
-    });
+        const hashedToken = crypto.createHash("sha256").update(token).digest("hex");
+        const user = await User.findOne({
+            resetPasswordToken: hashedToken,
+            resetPasswordExpires: { $gt: Date.now() },
+        });
 
-    if (!user) {
+        if (!user) {
+            return NextResponse.json(
+                { error: "Invalid or expired reset token." },
+                { status: 400 }
+            );
+        }
+
+        const hashedPassword = await bcrypt.hash(password, 12);
+
+        await User.updateOne(
+            { _id: user._id },
+            {
+                $set: { password: hashedPassword },
+                $unset: { resetPasswordToken: 1, resetPasswordExpires: 1 },
+            }
+        );
+
+        return NextResponse.json({ message: "Password reset successful" });
+    } catch (error: any) {
+        console.error("Reset password error:", error);
         return NextResponse.json(
-            { error: "Invalid or expired reset token." },
-            { status: 400 }
+            { error: error?.message || "An error occurred while resetting the password." },
+            { status: 500 }
         );
     }
-
-    // Hash the new password
-    const hashedPassword = await bcrypt.hash(password, 12);
-
-    // Update the user's password and remove the reset token
-    user.password = hashedPassword;
-    user.resetPasswordToken = undefined;
-    user.resetPasswordExpires = undefined;
-
-    await user.save({ validateModifiedOnly: true });
-
-    return NextResponse.json({ message: "Password reset successful" });
 }
